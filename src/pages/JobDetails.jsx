@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import PageHeader from "../components/PageHeader";
 import { useParams } from "react-router-dom";
 import { FaBriefcase } from "react-icons/fa6";
 import Modal from 'react-modal';
 import './css/JobDetails.css';
+import { AuthContext } from "../context/AuthProvider";
 
 Modal.setAppElement('#root'); // Set the root element for accessibility
 
 const JobDetails = () => {
+  const { user } = useContext(AuthContext);
   const { id } = useParams();
   const numbersOnly = id?.match(/\d+/g);
   const jobId = numbersOnly.join("");
@@ -66,24 +68,36 @@ const JobDetails = () => {
     setModalIsOpen(false);
   };
 
+  console.log(job);
   const handleApplySubmit = () => {
     // Basic form validation
     let isValid = true;
     const newErrors = {};
 
-    if (!applicationData.email) {
-      newErrors.email = 'Email is required';
+    // Email validation using a regular expression
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!applicationData.email || !emailRegex.test(applicationData.email)) {
+      newErrors.email = 'Please enter a valid email address';
       isValid = false;
     }
 
-    if (!applicationData.phoneNumber) {
-      newErrors.phoneNumber = 'Phone Number is required';
+    // Phone number validation using a regular expression
+    const phoneRegex = /^[0-9]{9,13}$/;
+    if (!applicationData.phoneNumber || !phoneRegex.test(applicationData.phoneNumber)) {
+      newErrors.phoneNumber = 'Please enter a valid phone number.';
       isValid = false;
     }
 
     if (!applicationData.cvLink) {
       newErrors.cvLink = 'CV Link is required';
       isValid = false;
+    } else {
+      // Validate the CV link using a regular expression
+      const urlRegex = /^(ftp|http|https):\/\/[^ "]+$/;
+      if (!urlRegex.test(applicationData.cvLink)) {
+        newErrors.cvLink = 'Please enter a valid URL';
+        isValid = false;
+      }
     }
 
     if (isValid) {
@@ -92,25 +106,65 @@ const JobDetails = () => {
       console.log('Phone Number:', applicationData.phoneNumber);
       console.log('CV Link:', applicationData.cvLink);
 
-      // Add your logic to submit the application data
-      // For example, you can make an API call here
-      // and then close the modal
-      setModalIsOpen(false);
-      setApplicationData({
-        email: '',
-        phoneNumber: '',
-        cvLink: '',
-      });
+      // Prepare the data to be sent in the request body
+      const requestBody = {
+        userEmail: user?.email,
+        email: applicationData.email,
+        phoneNumber: applicationData.phoneNumber,
+        cvLink: applicationData.cvLink,
+        companyLogo: job?.companyLogo,
+        companyName: job?.companyName,
+        jobLocation: job?.jobLocation,
+        jobID: job?._id,
+        jobTitle:job?.jobTitle,
+        appliedTime: new Date(),
+        applyStatus: 'Under Review'
+      };
+
+      fetch('http://localhost:5000/apply-for-job', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json', // Specify that you are sending JSON data
+          // Add any other headers as needed
+        },
+        body: JSON.stringify(requestBody), // Convert the data to JSON format
+      })
+        .then(response => {
+          if (response.ok) {
+            // For example, you can handle success here
+            console.log('Application submitted successfully!');
+            // Close the modal and reset the form
+            setModalIsOpen(false);
+            setApplicationData({
+              email: '',
+              phoneNumber: '',
+              cvLink: '',
+            });
+          } else {
+            // Handle errors if the request was not successful
+            console.error('Failed to submit application:', response.status, response.statusText);
+          }
+        })
+        .catch(error => {
+          // Handle network errors or other issues
+          console.error('Error during application submission:', error.message);
+        });
     } else {
       // Display validation errors
       setErrors(newErrors);
     }
   };
 
+
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <div className="text-3xl font-semibold text-gray-700">Loading...</div>
+        <div className="text-3xl font-semibold text-gray-700">
+          <div className="flex items-center justify-center">
+            <span className="loading loading-dots loading-lg"></span>
+          </div>
+        </div>
       </div>
     );
   }
@@ -151,7 +205,7 @@ const JobDetails = () => {
             </p>
             <ul className="list-disc list-outside text-primary/90 space-y-2 text-base">
               <li>
-                1. ${job.minPrice}-{job.maxPrice}k
+                1. ${job.minPrice}-{job.maxPrice}k <span className="text-green-500 text-sm">/year</span>
               </li>
               <li>2. Disability insurance</li>
               <li>3. Employee discount</li>
@@ -196,73 +250,73 @@ const JobDetails = () => {
         {/* Application Modal */}
         {/* Application Modal */}
         <Modal
-        isOpen={modalIsOpen}
-        onRequestClose={closeModal}
-        contentLabel="Job Application Modal"
-        className="modal-content bg-white p-8 rounded-md absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full md:w-96 m-5 mx-auto"
-        overlayClassName="modal-overlay fixed top-0 left-0 right-0 bottom-0 bg-black"
-      >
-        <div className="modal-header flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Job Application</h2>
-        </div>
-        <div className="modal-body flex flex-col gap-4">
-          <label className="text-sm font-semibold" htmlFor="email">
-            Email:
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            required
-            value={applicationData.email}
-            onChange={handleInputChange}
-            className="border border-gray-300 rounded-md p-2"
-          />
-          {errors.email && <p className="text-red-500">{errors.email}</p>}
+          isOpen={modalIsOpen}
+          onRequestClose={closeModal}
+          contentLabel="Job Application Modal"
+          className="modal-content bg-white p-8 rounded-md absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full md:w-96 m-5 mx-auto"
+          overlayClassName="modal-overlay fixed top-0 left-0 right-0 bottom-0 bg-black"
+        >
+          <div className="modal-header flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold">Job Application</h2>
+          </div>
+          <div className="modal-body flex flex-col gap-4">
+            <label className="text-sm font-semibold" htmlFor="email">
+              Email:
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              required
+              value={applicationData.email}
+              onChange={handleInputChange}
+              className="border border-gray-300 rounded-md p-2"
+            />
+            {errors.email && <p className="text-red-500">{errors.email}</p>}
 
-          <label className="text-sm font-semibold" htmlFor="phoneNumber">
-            Phone Number:
-          </label>
-          <input
-            type="tel"
-            id="phoneNumber"
-            name="phoneNumber"
-            required
-            value={applicationData.phoneNumber}
-            onChange={handleInputChange}
-            className="border border-gray-300 rounded-md p-2"
-          />
-          {errors.phoneNumber && <p className="text-red-500">{errors.phoneNumber}</p>}
+            <label className="text-sm font-semibold" htmlFor="phoneNumber">
+              Phone Number:
+            </label>
+            <input
+              type="tel"
+              id="phoneNumber"
+              name="phoneNumber"
+              required
+              value={applicationData.phoneNumber}
+              onChange={handleInputChange}
+              className="border border-gray-300 rounded-md p-2"
+            />
+            {errors.phoneNumber && <p className="text-red-500">{errors.phoneNumber}</p>}
 
-          <label className="text-sm font-semibold" htmlFor="cvLink">
-            CV Link:
-          </label>
-          <input
-            type="text"
-            id="cvLink"
-            name="cvLink"
-            required
-            value={applicationData.cvLink}
-            onChange={handleInputChange}
-            className="border border-gray-300 rounded-md p-2"
-          />
-          {errors.cvLink && <p className="text-red-500">{errors.cvLink}</p>}
+            <label className="text-sm font-semibold" htmlFor="cvLink">
+              CV Link:
+            </label>
+            <input
+              type="text"
+              id="cvLink"
+              name="cvLink"
+              required
+              value={applicationData.cvLink}
+              onChange={handleInputChange}
+              className="border border-gray-300 rounded-md p-2"
+            />
+            {errors.cvLink && <p className="text-red-500">{errors.cvLink}</p>}
 
-          <button
-            onClick={handleApplySubmit}
-            className="bg-blue text-white px-4 py-2 rounded-md hover:bg-blue"
-          >
-            Continue Application
-          </button>
+            <button
+              onClick={handleApplySubmit}
+              className="bg-blue text-white px-4 py-2 rounded-md hover:bg-blue"
+            >
+              Continue Application
+            </button>
 
-          <button
-            className="close-button text-red-400 bg-red-500 font-semibold hover:bg-red-500 hover:text-white rounded px-3 py-2 mt-4"
-            onClick={closeModal}
-          >
-            Cancel Application
-          </button>
-        </div>
-      </Modal>
+            <button
+              className="close-button text-red-400 bg-red-500 font-semibold hover:bg-red-500 hover:text-white rounded px-3 py-2 mt-4"
+              onClick={closeModal}
+            >
+              Cancel Application
+            </button>
+          </div>
+        </Modal>
       </div>
     </div>
   );

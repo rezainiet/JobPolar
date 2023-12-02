@@ -11,6 +11,10 @@ import JobDetails from '../pages/JobDetails';
 import Login from '../pages/Login';
 import PrivateRoute from '../PrivateRoute/PrivateRoute';
 import SignUp from '../pages/SignUp';
+import Dashboard from '../components/Dashboard/Dashboard';
+import ManageProfile from '../components/ManageProfile/ManageProfile';
+import TestingQR from '../pages/TestingQR/TestingQR';
+import ApprovedJobs from '../components/Dashboard/ApprovedJobs';
 
   const router = createBrowserRouter([
     {
@@ -39,6 +43,19 @@ import SignUp from '../pages/SignUp';
           loader: ({params}) => fetch(`http://localhost:5000/all-jobs/${params.id}`)
         },
         {
+          path: "details/:id",
+          element: <ApprovedJobs/>,
+          loader: ({params}) => fetch(`http://localhost:5000/all-jobs/${params.id}`)
+        },
+        {
+          path:"/dashboard",
+          element: <PrivateRoute><Dashboard/></PrivateRoute>,
+        },
+        {
+          path:"/manage-profile",
+          element: <PrivateRoute><ManageProfile/></PrivateRoute>,
+        },
+        {
           path:"/jobs/:id",
           element: <PrivateRoute><JobDetails/></PrivateRoute>,
         }
@@ -47,6 +64,10 @@ import SignUp from '../pages/SignUp';
     {
       path: "/login",
       element: <Login/>
+    },
+    {
+      path: "/test",
+      element: <TestingQR/>
     },
     {
       path: "/sign-up",

@@ -9,7 +9,7 @@ const Navbar = () => {
   const { user, logOut, loading } = useContext(AuthContext);
   console.log(user)
 
-  
+
   const handleLogout = () => {
     logOut()
       .then(() => {
@@ -31,10 +31,6 @@ const Navbar = () => {
     { path: "/post-job", title: "Post A Job" },
   ];
 
-
-  const handleClickOnProfile = () =>{
-    console.log('clicked');
-  }
 
 
 
@@ -80,7 +76,9 @@ const Navbar = () => {
           {user ? (
             <>
               <div className="flex gap-4 items-center">
-                <div className="flex -space-x-2 overflow-hidden" onClick={() => handleClickOnProfile()}>
+                <div className="dropdown dropdown-bottom dropdown-end">
+                  <div tabIndex={0} role="button" className="m-1">
+                  <div className="flex -space-x-2 overflow-hidden" >
                   {
                     user?.photoURL ? <> <img
                     className="inline-block h-10 w-10 rounded-full ring-2 ring-white"
@@ -93,6 +91,15 @@ const Navbar = () => {
                   /></>
                   }
                  
+                </div>
+                  </div>
+                  <ul className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                    <li><a>Support/Feedback</a></li>
+                    <li><a>Applied Jobs</a></li>
+                    <li><a href="/manage-profile">Profile</a></li>
+                    <li><a href="/dashboard">Dashboard</a></li>
+                    <li><a >Settings</a></li>
+                  </ul>
                 </div>
                 <button onClick={handleLogout} className="py-2 px-5 border rounded hover:bg-blue hover:text-white">Log out</button>
               </div>
@@ -131,9 +138,8 @@ const Navbar = () => {
 
       {/* mobile menu items */}
       <div
-        className={`px-4 bg-green-300 py-5 rounded-sm ${
-          isMenuOpen ? "" : "hidden"
-        }`}
+        className={`px-4 bg-green-300 py-5 rounded-sm ${isMenuOpen ? "" : "hidden"
+          }`}
       >
         <ul>
           {navItems.map(({ path, title }) => (

@@ -9,7 +9,7 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [jobs, setJobs] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 10;
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -77,8 +77,8 @@ const Home = () => {
 
     // Applying selected filter
     if (selected) {
-      console.log((selected));
-
+      console.log(selected);
+    
       filteredJobs = filteredJobs.filter(
         ({
           jobLocation,
@@ -88,15 +88,17 @@ const Home = () => {
           postingDate,
           employmentType,
         }) =>
-          jobLocation.toLowerCase() === selected.toLowerCase() ||
+          jobLocation.toLowerCase().includes(selected.toLowerCase()) ||
           postingDate === selected ||
           parseInt(maxPrice) <= parseInt(selected) ||
           salaryType.toLowerCase() === selected.toLowerCase() ||
-         experienceLevel.toLowerCase() === selected.toLowerCase() ||
+          experienceLevel.toLowerCase() === selected.toLowerCase() ||
           employmentType.toLowerCase() === selected.toLowerCase()
       );
+    
       console.log(filteredJobs);
     }
+    
 
     // Slice the data based on the current page
     const { startIndex, endIndex } = calculatePageRange();
@@ -118,7 +120,11 @@ const Home = () => {
         </div>
         <div className="col-span-2 bg-white p-4 rounded">
           {isLoading ? ( // Loading indicator
-            <p className="font-medium">Loading...</p>
+            <p className="font-medium">
+              <div className="flex items-center justify-center">
+                <span className="loading loading-dots loading-lg"></span>
+              </div>
+            </p>
           ) : result.length > 0 ? (
             <Jobs result={result} />
           ) : (

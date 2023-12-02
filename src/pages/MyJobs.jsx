@@ -139,7 +139,7 @@ console.log(currentJobs)
                   {/* set loding here */}
                   {isLoading ? (
                     <div className="flex items-center justify-center h-20">
-                      <p>loading......</p>
+                      <span className="loading loading-dots loading-lg"></span>
                     </div>
                   ) : (
                     <tbody>

@@ -2,6 +2,7 @@
 import { Outlet } from 'react-router-dom'
 import './App.css'
 import Navbar from './components/Navbar'
+import FooterLinks from './components/FooterLinks/FooterLinks'
 
 function App() {
 
@@ -10,6 +11,7 @@ function App() {
     <div>
     <Navbar/>
     <Outlet/>
+    {/* <FooterLinks/> */}
     </div>
   )
 }
