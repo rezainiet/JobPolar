@@ -24,7 +24,7 @@ const UpdateJob = () => {
     data.skills = selectedOption;
     // console.log(data)
      // update the book object
-     fetch(`http://localhost:5000/update-job/${id}`, {
+     fetch(`https://job-polar-server.vercel.app/update-job/${id}`, {
       method: "PATCH",
 
       headers: {

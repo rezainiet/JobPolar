@@ -34,7 +34,7 @@ const JobDetails = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`http://localhost:5000/all-jobs/${id}`)
+    fetch(`https://job-polar-server.vercel.app/all-jobs/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setJob(data);
@@ -121,7 +121,7 @@ const JobDetails = () => {
         applyStatus: 'Under Review'
       };
 
-      fetch('http://localhost:5000/apply-for-job', {
+      fetch('https://job-polar-server.vercel.app/apply-for-job', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json', // Specify that you are sending JSON data

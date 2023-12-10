@@ -1,15 +1,21 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../context/AuthProvider';
 import { Link } from 'react-router-dom';
+import { formatDistanceToNow } from 'date-fns';
 
 const AppliedJobs = () => {
     const { user, logOut, loading } = useContext(AuthContext);
     const [jobs, setJobs] = useState([]);
+    const [isLoading, setLoading] = useState(false);
 
     useEffect(() => {
-        fetch(`http://localhost:5000/get-applied-jobs/${user?.email}`)
-        .then(res => res.json())
-        .then(data => setJobs(data));
+        setLoading(true)
+        fetch(`https://job-polar-server.vercel.app/get-applied-jobs/${user?.email}`)
+            .then(res => res.json())
+            .then(data => {
+                setJobs(data);
+                setLoading(false);
+            });
     }, [user]);
 
     console.log(jobs);
@@ -39,29 +45,38 @@ const AppliedJobs = () => {
         <div>
             <div>
                 <div className="max-w-screen-2xl container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {jobs.map((job) => (
-                        <div key={job?._id} className="bg-white rounded-lg shadow-md p-4">
-                            <div className="flex items-center justify-between mb-4">
-                                <img
-                                    src={job?.companyLogo}
-                                    alt={`${job.companyName} Logo`}
-                                    className="w-12 h-12 object-cover rounded-full"
-                                />
-                                <span className="text-gray-500 text-sm">{job.appliedTime}</span>
+                    {
+                        isLoading || loading ? <p className="font-medium">
+                            <div className="flex items-center justify-center">
+                                <span className="loading loading-dots loading-lg"></span>
                             </div>
-                            <h2 className="text-lg font-semibold mb-2">{job.companyName}</h2>
-                            <p className="text-gray-600 mb-2">{job?.jobTitle}</p>
-                            <p className="text-gray-600 mb-2">{job?.jobLocation}</p>
-                            <div className='flex justify-between items-center'>
-                                <span className={`text-sm font-semibold ${job.applyStatus === 'Approved' ? 'text-blue' : 'text-yellow-500'}`}>
-                                    {job.applyStatus}
-                                </span>
-                                <button disabled={job.applyStatus !== 'Approved'} className='btn btn-sm'>
-                                <Link to={`/details/${job?.jobID}`}>More Info</Link>
-                                </button>
-                            </div>
-                        </div>
-                    ))}
+                        </p> :
+                            jobs.map((job) => (
+                                <div key={job?._id} className="bg-white rounded-lg shadow-md p-4">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <img
+                                            src={job?.companyLogo}
+                                            alt={`${job.companyName} Logo`}
+                                            className="w-12 h-12 object-cover rounded-full"
+                                        />
+                                        <span className="text-gray-500 text-sm">
+                                            {formatDistanceToNow(new Date(job.appliedTime), { addSuffix: true })}
+                                        </span>
+                                    </div>
+                                    <h2 className="text-lg font-semibold mb-2">{job.companyName}</h2>
+                                    <p className="text-gray-600 mb-2">{job?.jobTitle}</p>
+                                    <p className="text-gray-600 mb-2">{job?.jobLocation}</p>
+                                    <div className='flex justify-between items-center'>
+                                        <span className={`text-sm font-semibold ${job.applyStatus === 'Approved' ? 'text-blue' : 'text-yellow-500'}`}>
+                                            {job.applyStatus}
+                                        </span>
+                                        <button disabled={job.applyStatus !== 'Approved'} className='btn btn-sm'>
+                                            <Link to={`/details/${job?.jobID}`}>Details</Link>
+                                        </button>
+                                    </div>
+                                </div>
+                            ))
+                    }
                 </div>
             </div>
         </div>

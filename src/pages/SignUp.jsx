@@ -25,7 +25,7 @@ const SignUp = () => {
 
       if (success) {
         // Make a POST request to the server
-        const response = await fetch("http://localhost:5000/register-user", {
+        const response = await fetch("https://job-polar-server.vercel.app/register-user", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

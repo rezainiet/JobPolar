@@ -28,7 +28,7 @@ const Dashboard = () => {
 
 
     return (
-        <div className="max-w-screen-2xl container mx-auto xl:px-24 md:py-20 py-14 px-4 bg-[#F3F7FB] h-screen">
+        <div className="max-w-screen-2xl container mx-auto xl:px-24 md:py-20 py-14 px-4 bg-[#F3F7FB]">
             <h1 className="text-4xl font-bold text-primary mb-3">
                 Welcome to <span className='text-blue'>Your Job Portal Dashboard</span>
             </h1>

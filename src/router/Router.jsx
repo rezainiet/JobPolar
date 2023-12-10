@@ -40,12 +40,12 @@ import ApprovedJobs from '../components/Dashboard/ApprovedJobs';
         {
           path: "edit-job/:id",
           element: <UpdateJob/>,
-          loader: ({params}) => fetch(`http://localhost:5000/all-jobs/${params.id}`)
+          loader: ({params}) => fetch(`https://job-polar-server.vercel.app/all-jobs/${params.id}`)
         },
         {
           path: "details/:id",
           element: <ApprovedJobs/>,
-          loader: ({params}) => fetch(`http://localhost:5000/all-jobs/${params.id}`)
+          loader: ({params}) => fetch(`https://job-polar-server.vercel.app/all-jobs/${params.id}`)
         },
         {
           path:"/dashboard",
