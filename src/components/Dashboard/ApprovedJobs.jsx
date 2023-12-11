@@ -19,7 +19,7 @@ const ApprovedJobs = () => {
   });
 
   const { data: messages, isLoading: messagesLoading, refetch: refetchMessages } = useQuery(['messages', id], async () => {
-    const response = await fetch(`http://localhost:4000/messages/${id}`);
+    const response = await fetch(`https://job-polar-server.vercel.app/messages/${id}`);
     const data = await response.json();
     return data;
   });
@@ -27,7 +27,7 @@ const ApprovedJobs = () => {
   // React Query mutation for adding a new message
   const addMessageMutation = useMutation(
     async () => {
-      const response = await fetch('http://localhost:4000/messages', {
+      const response = await fetch('https://job-polar-server.vercel.app/messages', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

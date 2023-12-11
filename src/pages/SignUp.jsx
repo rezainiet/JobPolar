@@ -2,6 +2,8 @@ import React, { useContext, useState } from "react";
 import { FaGoogle, FaFacebookF, FaLinkedin, FaInstagram } from "react-icons/fa";
 import { AuthContext } from "../context/AuthProvider";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useMutation } from "react-query";
+import { getAuth, updateProfile } from "firebase/auth";
 
 const SignUp = () => {
   const [errorMessage, setErrorMessage] = useState("");
@@ -12,7 +14,45 @@ const SignUp = () => {
 
   const from = location.state?.from?.pathname || "/";
 
-  const handleSignUp = async (event) => {
+  const signUpMutation = useMutation(
+    async ({ email, password, name, phone }) => {
+      // Firebase Authentication
+      const auth = getAuth();
+      const success = await createUser(email, password);
+
+      // Update profile with name
+      if (success) {
+        await updateProfile(auth.currentUser, {
+          displayName: name
+        });
+      }
+
+      // API Call
+      const response = await fetch("https://job-polar-server.vercel.app/register-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, name, phone }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to register on the server.");
+      }
+    },
+    {
+      onSuccess: () => {
+        alert("Sign up successful!");
+        navigate(from, { replace: true });
+      },
+      onError: (error) => {
+        setErrorMessage("Failed to sign up. Please try again.");
+        console.error("Error during sign-up:", error);
+      },
+    }
+  );
+
+  const handleSignUp = (event) => {
     event.preventDefault();
     const form = event.target;
     const email = form.email.value;
@@ -20,30 +60,7 @@ const SignUp = () => {
     const name = form.name.value;
     const phone = form.phone.value;
 
-    try {
-      const success = await createUser(email, password);
-
-      if (success) {
-        // Make a POST request to the server
-        const response = await fetch("https://job-polar-server.vercel.app/register-user", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, name, phone }),
-        });
-
-        // Check if the request was successful
-        if (response.ok) {
-          alert("Sign up successful!");
-          navigate(from, { replace: true });
-        } else {
-          throw new Error("Failed to register on the server.");
-        }
-      }
-    } catch (error) {
-      setErrorMessage("Failed to sign up. Please try again.");
-    }
+    signUpMutation.mutate({ email, password, name, phone });
   };
 
   return (
@@ -107,7 +124,7 @@ const SignUp = () => {
             >
               Sign Up
             </button>
-            <a href="/login"className="bg-slate-100 text-sm py-2 px-3 rounded">Already have an Account?</a>
+            <a href="/login" className="bg-slate-100 text-sm py-2 px-3 rounded">Already have an Account?</a>
           </div>
         </form>
         <hr className="my-4" />
