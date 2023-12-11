@@ -78,20 +78,20 @@ const Navbar = () => {
               <div className="flex gap-4 items-center">
                 <div className="dropdown dropdown-bottom dropdown-end">
                   <div tabIndex={0} role="button" className="m-1">
-                  <div className="flex -space-x-2 overflow-hidden" >
-                  {
-                    user?.photoURL ? <> <img
-                    className="inline-block h-10 w-10 rounded-full ring-2 ring-white"
-                    src={user?.photoURL}
-                    alt=""
-                  /></> : <> <img
-                    className="inline-block h-10 w-10 rounded-full ring-2 ring-white"
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                    alt=""
-                  /></>
-                  }
-                 
-                </div>
+                    <div className="flex -space-x-2 overflow-hidden" >
+                      {
+                        user?.photoURL ? <> <img
+                          className="inline-block h-10 w-10 rounded-full ring-2 ring-white"
+                          src={user?.photoURL}
+                          alt=""
+                        /></> : <> <img
+                          className="inline-block h-10 w-10 rounded-full ring-2 ring-white"
+                          src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                          alt=""
+                        /></>
+                      }
+
+                    </div>
                   </div>
                   <ul className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
                     <li><a>Support/Feedback</a></li>
@@ -157,11 +157,58 @@ const Navbar = () => {
             </li>
           ))}
 
-          <li className="text-white py-1">
-            {
-              user ? <button onClick={handleLogout} className="py-2 px-5 border rounded hover:bg-blue hover:text-white">Log out</button> : <Link to="login">Log in</Link>
-            }
-          </li>
+
+          {
+            isMenuOpen && <>
+              <div className="text-base text-primary font-medium space-x-5 lg:block">
+                {user ? (
+                  <>
+                    <div className="flex gap-4 items-center">
+                      <div className="dropdown dropdown-bottom dropdown-start">
+                        <div tabIndex={0} role="button" className="m-1">
+                          <div className="flex -space-x-2 overflow-hidden" >
+                            {
+                              user?.photoURL ? <> <img
+                                className="inline-block h-10 w-10 rounded-full ring-2 ring-white"
+                                src={user?.photoURL}
+                                alt=""
+                              /></> : <> <img
+                                className="inline-block h-10 w-10 rounded-full ring-2 ring-white"
+                                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                                alt=""
+                              /></>
+                            }
+
+                          </div>
+                        </div>
+                        <ul className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+                          <li><a>Support/Feedback</a></li>
+                          <li><a>Applied Jobs</a></li>
+                          <li><a href="/manage-profile">Profile</a></li>
+                          <li><a href="/dashboard">Dashboard</a></li>
+                          <li><a >Settings</a></li>
+                        </ul>
+                      </div>
+                      <button onClick={handleLogout} className="py-2 px-5 border rounded hover:bg-blue hover:text-white">Log out</button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {" "}
+                    <Link to="/login" className="py-2 px-5 border rounded">
+                      Log in
+                    </Link>
+                    <Link
+                      to="/sign-up"
+                      className="bg-blue py-2 px-5 text-white rounded"
+                    >
+                      Sign up
+                    </Link>
+                  </>
+                )}
+              </div>
+            </>
+          }
         </ul>
       </div>
     </header>

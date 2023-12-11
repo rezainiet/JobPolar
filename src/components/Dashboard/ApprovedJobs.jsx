@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery, useMutation } from 'react-query';
 import PageHeader from '../PageHeader';
@@ -9,6 +9,7 @@ const ApprovedJobs = () => {
   const { user } = useContext(AuthContext);
   const { id } = useParams();
   const [newMessage, setNewMessage] = useState('');
+  const messagesContainerRef = useRef(null); // Ref for the messages container
 
   // React Query hooks for fetching data
   const { data: job, isLoading: jobLoading } = useQuery(['jobDetails', id], async () => {
@@ -50,9 +51,14 @@ const ApprovedJobs = () => {
         // Refetch messages after a new message is added
         refetchMessages();
         setNewMessage('');
+
+        // Scroll to the bottom when a new message is added
+        messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
       },
     }
   );
+
+  console.log(messagesContainerRef?.current?.scrollTop, messagesContainerRef?.current?.scrollHeight);
 
   const addMessage = () => {
     if (newMessage.trim() !== '') {
@@ -108,8 +114,8 @@ const ApprovedJobs = () => {
 
 
         {/* Chat section */}
-        <div className="flex flex-col h-full bg-white px-5 pt-5 rounded-lg">
-          <div className="flex-1 overflow-y-auto max-h-[600px]"> {/* Set a fixed height */}
+        <div className="flex flex-col h-full bg-white px-5 pt-5 rounded-lg" >
+          <div className="flex-1 overflow-y-auto max-h-[600px]" ref={messagesContainerRef}>
             <div className='my-5'>
               <div className='bg-blue rounded-lg py-5 px-3 flex items-center justify-center gap-2'>
                 <img src={job?.companyLogo} className='w-16 rounded-full' alt={job?.companyName} />
@@ -118,7 +124,7 @@ const ApprovedJobs = () => {
             </div>
             {messages &&
               messages.map((message, key) => (
-                <div key={key} className={message?.user ? 'chat chat-end' : 'chat chat-start'}>
+                <div key={key} className={message?.user ? 'chat chat-end' : 'chat chat-start'} >
                   <div className="chat-image avatar">
                     <div className="w-10 rounded-full">
                       <img alt="Chat bubble component" src={message?.user ? message?.photoUrl : job?.companyLogo} />
